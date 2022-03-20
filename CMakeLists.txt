@@ -38,15 +38,34 @@ if(CPP)
   message(STATUS "Using gRPC ${gRPC_VERSION}")
   set(_GRPC_GRPCPP gRPC::grpc++)
 
-  # Generated sources
-  set(api_proto_src "${CMAKE_CURRENT_BINARY_DIR}/cpp/api.pb.cc")
-  set(api_proto_hdr "${CMAKE_CURRENT_BINARY_DIR}/cpp/api.pb.h")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cpp")
+  set(TARGET_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp_install/${CMAKE_SYSTEM_PROCESSOR})
+
+  set(CMAKE_TARGET_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp)
+
+  file(GLOB PROTO_FILES ${CMAKE_CURRENT_LIST_DIR}/proto/*.proto)
+  # Replace .proto -> .pb.cc
+  string(REGEX REPLACE "[.]proto$" ".pb.cc" SRC_FILES ${PROTO_FILES})
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_FILES ${SRC_FILES})
+  # Replace .proto -> .grpc.pb.cc
+  string(REGEX REPLACE "[.]proto$" ".grpc.pb.cc" SRC_GRPC_FILES ${PROTO_FILES})
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_GRPC_FILES ${SRC_GRPC_FILES})
+
+  # Replace .proto -> .pb.h
+  string(REGEX REPLACE "[.]proto$" ".pb.h" INC_FILES ${PROTO_FILES})
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_FILES ${INC_FILES})
+  # Replace .proto -> grpc.pb.h
+  string(REGEX REPLACE "[.]proto$" ".grpc.pb.h" INC_GRPC_FILES ${PROTO_FILES})
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_GRPC_FILES ${INC_GRPC_FILES})
+  
+  message(STATUS ${SRC_GRPC_FILES})
+  message(STATUS ${INC_GRPC_FILES})
+
+  file(MAKE_DIRECTORY "${CMAKE_TARGET_DIRECTORY}")
   add_custom_command(
-    OUTPUT "${api_proto_src}" "${api_proto_hdr}"
+    OUTPUT "${SRC_FILES}" "${INC_FILES}" "${SRC_GRPC_FILES}" "${INC_GRPC_FILES}"
     COMMAND ${PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}/cpp"
-      --cpp_out "${CMAKE_CURRENT_BINARY_DIR}/cpp"
+    ARGS --grpc_out "${CMAKE_TARGET_DIRECTORY}"
+      --cpp_out "${CMAKE_TARGET_DIRECTORY}"
       -I "${CMAKE_CURRENT_LIST_DIR}/proto"
       --plugin=protoc-gen-grpc="${GRPC_CPP_PLUGIN}"
       "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
@@ -54,9 +73,10 @@ if(CPP)
 
   include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-  add_library(neptune-profiler-proto SHARED
-    ${api_proto_src}
-    ${api_proto_hdr})
+  add_library(neptune-profiler-proto STATIC
+    ${SRC_FILES}
+    ${SRC_GRPC_FILES}
+  )
 
   target_link_libraries(neptune-profiler-proto
     ${_REFLECTION}
@@ -64,13 +84,13 @@ if(CPP)
     ${_PROTOBUF_LIBPROTOBUF})
 
   install(
-    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp
-    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/
+    DIRECTORY ${CMAKE_TARGET_DIRECTORY}
+    DESTINATION ${TARGET_DIRECTORY}
     FILES_MATCHING # install only matched files
     PATTERN "*.h" # select header files
   )
 
-  install(TARGETS neptune-profiler-proto DESTINATION ${CMAKE_CURRENT_LIST_DIR}/cpp/lib)
+  install(TARGETS neptune-profiler-proto DESTINATION ${TARGET_DIRECTORY}/lib)
 
 endif(CPP)
 
