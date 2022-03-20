@@ -1,57 +1,89 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.5)
+#----------------------------------------------------------------
+#  Copyright (c) Coding Nerd
+#  Licensed under the Apache License, Version 2.0
+#  See LICENSE in the project root for license information.
+#----------------------------------------------------------------
+cmake_minimum_required(VERSION 3.5.1)
 
-if(neptune_VERBOSE)
-  message(STATUS "Neptune Buffers Configuring...")
-endif()
-
-# CMake policies
-cmake_policy(SET CMP0022 NEW)
-# On MacOS use @rpath/ for target's install name prefix path
-if (POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif ()
-# Clear VERSION variables when no VERSION is given to project()
-if(POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
-endif()
-# MSVC runtime library flags are selected by an abstraction.
-if(POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
-endif()
+include(cmake/common.cmake)
 
 project(neptune-profiler-proto)
-
-# Add c++11 flags
-if (CYGWIN)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-else()
-  set(CMAKE_CXX_STANDARD 11)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
-
-# The Intel compiler isn't able to deal with noinline member functions of
-# template classes defined in headers.  As such it spams the output with
-#   warning #2196: routine is both "inline" and "noinline"
-# This silences that warning.
-if (CMAKE_CXX_COMPILER_ID MATCHES Intel)
-  string(APPEND CMAKE_CXX_FLAGS " -diag-disable=2196")
-endif()
 
 # INSTALL default: off
 option(INSTALL "Install neptune binaries and files" OFF)
 
-# doc default: off
-option(DOC "Generate and update the doc files" OFF)
+# doc default: on
+option(DOC "Generate and update the doc files" ON)
 
-if (BUILD_SHARED_LIBS)
-  set(neptune_BUILD_SHARED_LIBS_DEFAULT ON)
-else (BUILD_SHARED_LIBS)
-  set(neptune_BUILD_SHARED_LIBS_DEFAULT OFF)
-endif (BUILD_SHARED_LIBS)
-option(neptune_BUILD_SHARED_LIBS "Build Shared Libraries" ${neptune_BUILD_SHARED_LIBS_DEFAULT})
+# cpp default: on
+option(CPP "Generate and update the COO files" ON)
 
-if (DOC)
-  include(cmake/doc.cmake)
-endif (DOC)
+find_program(GRPC_CPP_PLUGIN "grpc_cpp_plugin")
+if (NOT GRPC_CPP_PLUGIN)
+    message(FATAL_ERROR "grpc_cpp_plugin not found!")
+ENDIF()
+
+if(CPP)
+  # Find Protobuf installation
+  # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
+  set(protobuf_MODULE_COMPATIBLE TRUE)
+  find_package(Protobuf CONFIG REQUIRED)
+  message(STATUS "Using protobuf ${Protobuf_VERSION}")
+  set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
+  set(_REFLECTION gRPC::grpc++_reflection)
+
+  # Find gRPC installation
+  # Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
+  find_package(gRPC CONFIG REQUIRED)
+  message(STATUS "Using gRPC ${gRPC_VERSION}")
+  set(_GRPC_GRPCPP gRPC::grpc++)
+
+  # Generated sources
+  set(api_proto_src "${CMAKE_CURRENT_BINARY_DIR}/cpp/api.pb.cc")
+  set(api_proto_hdr "${CMAKE_CURRENT_BINARY_DIR}/cpp/api.pb.h")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cpp")
+  add_custom_command(
+    OUTPUT "${api_proto_src}" "${api_proto_hdr}"
+    COMMAND ${PROTOC}
+    ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}/cpp"
+      --cpp_out "${CMAKE_CURRENT_BINARY_DIR}/cpp"
+      -I "${CMAKE_CURRENT_LIST_DIR}/proto"
+      --plugin=protoc-gen-grpc="${GRPC_CPP_PLUGIN}"
+      "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
+    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto")
+
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
+  add_library(neptune-profiler-proto SHARED
+    ${api_proto_src}
+    ${api_proto_hdr})
+
+  target_link_libraries(neptune-profiler-proto
+    ${_REFLECTION}
+    ${_GRPC_GRPCPP}
+    ${_PROTOBUF_LIBPROTOBUF})
+
+  install(
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp
+    DESTINATION ${CMAKE_CURRENT_LIST_DIR}/
+    FILES_MATCHING # install only matched files
+    PATTERN "*.h" # select header files
+  )
+
+  install(TARGETS neptune-profiler-proto DESTINATION ${CMAKE_CURRENT_LIST_DIR}/cpp/lib)
+
+endif(CPP)
+
+if(DOC)
+  set(DOC_FILE "${CMAKE_CURRENT_LIST_DIR}/doc/neptune-profiler-proto-doc.md")
+  add_custom_command(
+    OUTPUT ${DOC_FILE}
+    COMMAND ${PROTOC}
+    ARGS --doc_out=markdown,neptune-profiler-proto-doc.md:${CMAKE_CURRENT_LIST_DIR}/doc
+      -I "${CMAKE_CURRENT_LIST_DIR}/proto/"
+      "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
+    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto")
+
+  add_custom_target(doc ALL DEPENDS ${DOC_FILE})
+endif(DOC)
+
