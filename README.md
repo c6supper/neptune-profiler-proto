@@ -1,14 +1,13 @@
-# Neptune-Profiler-Proto
-All the proto message files for Neptune core communication with local and remote plugins.
-
 Neptune-Profiler-Proto
 ===========
+
+All the proto message files for Neptune core communication with local and remote plugins.
 
 This is a repository which contains the  [google protobuf](https://github.com/google/protobuf) messages.
 
 An IDL that defines contracts between local & remote plugins and neptune core.
 
-Several components uses this repository as a sub module. It takes neptune-profiler-proto compiles it into the specific language(CPP by default).
+Several components uses this repository as a sub module. It takes neptune-profiler-proto compiles it into the specific language(c++ by default).
 
 Prerequisites
 -----------------
