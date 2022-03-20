@@ -8,7 +8,7 @@ This is a repository which contains the  [google protobuf](https://github.com/go
 
 An IDL that defines contracts between local & remote plugins and neptune core.
 
-Several components uses this repository as a sub module. It takes neptune-profiler-proto compiles it into the specific language.
+Several components uses this repository as a sub module. It takes neptune-profiler-proto compiles it into the specific language(CPP by default).
 
 Prerequisites
 -----------------
