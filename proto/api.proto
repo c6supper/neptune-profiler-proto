@@ -6,5 +6,5 @@
 
 syntax = "proto3";
 
-package netpune_profiler.proto;
+package netpune.profiler.api;
 
