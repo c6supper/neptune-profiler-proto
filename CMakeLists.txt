@@ -21,7 +21,11 @@ option(CPP "Generate and update the COO files" ON)
 find_program(GRPC_CPP_PLUGIN "grpc_cpp_plugin")
 if (NOT GRPC_CPP_PLUGIN)
     message(FATAL_ERROR "grpc_cpp_plugin not found!")
-ENDIF()
+endif()
+  
+if (NOT CMAKE_CROSSCOMPILING)
+  find_package(Threads)
+endif()
 
 if(CPP)
   # Find Protobuf installation
@@ -42,46 +46,66 @@ if(CPP)
 
   set(CMAKE_TARGET_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp)
 
-  message(STATUS "CMAKE_CURRENT_LIST_DIR=${CMAKE_CURRENT_LIST_DIR}")
-  message(STATUS "CMAKE_TARGET_DIRECTORY=${CMAKE_TARGET_DIRECTORY}")
+  message(DEBUG "CMAKE_CURRENT_LIST_DIR=${CMAKE_CURRENT_LIST_DIR}")
+  message(DEBUG "CMAKE_TARGET_DIRECTORY=${CMAKE_TARGET_DIRECTORY}")
 
   file(GLOB PROTO_FILES ${CMAKE_CURRENT_LIST_DIR}/proto/*.proto)
+  file(GLOB GRPC_PROTO_FILES ${CMAKE_CURRENT_LIST_DIR}/proto/service/*.proto)
 
-  message(STATUS "PROTO_FILES=${PROTO_FILES}")
+  message(DEBUG "PROTO_FILES=${PROTO_FILES}")
   
   # Replace .proto -> .pb.cc
   string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_FILES ${PROTO_FILES})
   string(REGEX REPLACE "[.]proto" ".pb.cc;" SRC_FILES ${SRC_FILES})
-  
-  # Replace .proto -> .grpc.pb.cc
-  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_GRPC_FILES ${PROTO_FILES})
-  string(REGEX REPLACE "[.]proto" ".grpc.pb.cc;" SRC_GRPC_FILES ${SRC_GRPC_FILES})
-
   # Replace .proto -> .pb.h
   string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_FILES ${PROTO_FILES})
   string(REGEX REPLACE "[.]proto" ".pb.h;" INC_FILES ${INC_FILES})
 
+  # Replace .proto -> .grpc.pb.cc
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_GRPC_FILES ${GRPC_PROTO_FILES})
+  string(REGEX REPLACE "[.]proto" ".grpc.pb.cc;" SRC_GRPC_FILES ${SRC_GRPC_FILES})
   # Replace .proto -> grpc.pb.h
-  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_GRPC_FILES ${PROTO_FILES})
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_GRPC_FILES ${GRPC_PROTO_FILES})
   string(REGEX REPLACE "[.]proto" ".grpc.pb.h;" INC_GRPC_FILES ${INC_GRPC_FILES})
   
-  message(STATUS "SRC_FILES=${SRC_FILES}")
-  message(STATUS "SRC_GRPC_FILES=${SRC_GRPC_FILES}")
+  message(DEBUG "SRC_FILES=${SRC_FILES}")
+  message(DEBUG "SRC_GRPC_FILES=${SRC_GRPC_FILES}")
 
-  file(MAKE_DIRECTORY "${CMAKE_TARGET_DIRECTORY}")
-  add_custom_command(
-    OUTPUT "${SRC_FILES}" "${INC_FILES}" "${SRC_GRPC_FILES}" "${INC_GRPC_FILES}"
-    COMMAND ${PROTOC}
-    ARGS --grpc_out "${CMAKE_TARGET_DIRECTORY}"
+  file(MAKE_DIRECTORY "${CMAKE_TARGET_DIRECTORY}/service")
+
+  message(STATUS "${CMAKE_TARGET_DIRECTORY}")
+
+  foreach(proto ${PROTO_FILES})
+    execute_process(COMMAND ${PROTOC} --cpp_out "${CMAKE_TARGET_DIRECTORY}" -I "${CMAKE_CURRENT_LIST_DIR}/proto" "${proto}"
+    RESULT_VARIABLE PROTOC_RESULT)
+    if(NOT PROTOC_RESULT EQUAL "0")
+      message(FATAL_ERROR "protoc failed with ${PROTOC_RESULT}, please check")
+    endif()
+  endforeach(proto)
+
+  foreach(proto ${GRPC_PROTO_FILES})
+    execute_process(COMMAND ${PROTOC} --grpc_out "${CMAKE_TARGET_DIRECTORY}" 
       --cpp_out "${CMAKE_TARGET_DIRECTORY}"
-      -I "${CMAKE_CURRENT_LIST_DIR}/proto"
-      --plugin=protoc-gen-grpc="${GRPC_CPP_PLUGIN}"
-      "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
-    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto")
+      -I "${CMAKE_CURRENT_LIST_DIR}/proto" --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} "${proto}"
+    RESULT_VARIABLE PROTOC_RESULT)
+    if(NOT PROTOC_RESULT EQUAL "0")
+      message(FATAL_ERROR "protoc failed with ${PROTOC_RESULT}, please check")
+    endif()
+  endforeach(proto)
 
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+  # execute_process(COMMAND ${PROTOC} --grpc_out "${CMAKE_TARGET_DIRECTORY}/service" 
+  #   -I"${CMAKE_CURRENT_LIST_DIR}/proto" 
+  #   --plugin=protoc-gen-grpc="${GRPC_CPP_PLUGIN}" 
+  #   "${CMAKE_CURRENT_LIST_DIR}/proto/service/*.proto"
+  #   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  #   RESULT_VARIABLE GRPC_RESULT)
+  # if(NOT GRPC_RESULT EQUAL "0")
+  #   message(FATAL_ERROR "grpc failed with ${PROTOC_RESULT}, please check")
+  # endif()
 
-  add_library(neptune-profiler-proto STATIC
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/cpp")
+
+  add_library(neptune-profiler-proto SHARED
     ${SRC_FILES}
     ${SRC_GRPC_FILES}
   )
