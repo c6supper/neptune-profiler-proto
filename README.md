@@ -21,7 +21,20 @@ How to Build
 -----------------
 
 > * mkdir build && cd build
-> * cmake -DCMAKE_PREFIX_PATH=$QNX_TARGET/aarch64le/usr/lib/cmake/ ../
+> * for x86 testing purpose
+>> * cmake -DCMAKE_PREFIX_PATH=${HOME}/work/grpc_install/lib/cmake/ ../
+> * for QNX
+  ```bash
+  cmake -DCMAKE_CROSSCOMPILING=1 -DCMAKE_TOOLCHAIN_FILE=$QNX_ROOT/cmake/QNXToolchain.cmake \
+  -DProtobuf_DIR=$QNX_TARGET/aarch64le/usr/lib/cmake/protobuf \
+  -DgRPC_DIR=$QNX_TARGET/aarch64le/usr/lib/cmake/grpc \
+  -DZLIB_LIBRARY=$QNX_TARGET/aarch64le/usr/lib/libz.a \
+  -DOPENSSL_CRYPTO_LIBRARY=$QNX_TARGET/aarch64le/usr/lib/libcrypto.a \
+  -DOPENSSL_SSL_LIBRARY=$QNX_TARGET/aarch64le/usr/lib/libssl.a ../ && \
+  find . -name "link.txt" -exec sed -i "s/-lrt//g" {} + && \
+  find . -name "link.txt" -exec sed -i "s/-lpthread//g" {} + && \
+  make -j64
+  ```
 > * make install
 
 Documentation

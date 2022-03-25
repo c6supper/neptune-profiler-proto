@@ -23,9 +23,8 @@ if (NOT GRPC_CPP_PLUGIN)
     message(FATAL_ERROR "grpc_cpp_plugin not found!")
 endif()
   
-if (NOT CMAKE_CROSSCOMPILING)
-  find_package(Threads)
-endif()
+# bypass the cmake bug, QNX do not have pthread
+find_package(Threads)
 
 if(CPP)
   # Find Protobuf installation
@@ -115,6 +114,9 @@ if(CPP)
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
 
+  get_target_property(TARGET_LIBRARIES neptune-profiler-proto LINK_LIBRARIES)
+  message(${TARGET_LIBRARIES})
+  
   install(
     DIRECTORY ${CMAKE_TARGET_DIRECTORY}
     DESTINATION ${TARGET_DIRECTORY}
