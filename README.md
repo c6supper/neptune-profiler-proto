@@ -21,7 +21,7 @@ How to Build
 -----------------
 
 > * mkdir build && cd build
-> * cmake -DCMAKE_PREFIX_PATH=={where your grpc installed(build from source)} ../
+> * cmake -DCMAKE_PREFIX_PATH=$QNX_TARGET/aarch64le/usr/lib/cmake/ ../
 > * make install
 
 Documentation

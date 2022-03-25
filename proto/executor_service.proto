@@ -8,8 +8,6 @@ syntax = "proto3";
 
 package netpune.profiler.service;
 
-import "message.proto"
-
 // The executor service definition.
 service Executor {
   // Sends a executor
