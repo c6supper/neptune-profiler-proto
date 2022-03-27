@@ -135,8 +135,10 @@ if(DOC)
     COMMAND ${PROTOC}
     ARGS --doc_out=markdown,neptune-profiler-proto-doc.md:${CMAKE_CURRENT_LIST_DIR}/doc
       -I "${CMAKE_CURRENT_LIST_DIR}/proto/"
+      -I "${CMAKE_CURRENT_LIST_DIR}/service/proto/"
       "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
-    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto")
+      "${CMAKE_CURRENT_LIST_DIR}/proto/service/*.proto"
+    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto" "${CMAKE_CURRENT_LIST_DIR}/proto/service/*.proto")
 
   add_custom_target(doc ALL DEPENDS ${DOC_FILE})
 endif(DOC)

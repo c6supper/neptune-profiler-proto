@@ -22,7 +22,7 @@ How to Build
 
 > * mkdir build && cd build
 > * for x86 testing purpose
->> * cmake -DCMAKE_PREFIX_PATH=${HOME}/work/grpc_install/lib/cmake/ ../
+>> * cmake ../
 > * for QNX
   ```bash
   cmake -DCMAKE_CROSSCOMPILING=1 -DCMAKE_TOOLCHAIN_FILE=$QNX_ROOT/cmake/QNXToolchain.cmake \
