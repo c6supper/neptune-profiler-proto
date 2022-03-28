@@ -1,0 +1,22 @@
+/*----------------------------------------------------------------
+ *  Copyright (c) Coding Nerd
+ *  Licensed under the Apache License, Version 2.0
+ *  See LICENSE in the project root for license information.
+ *----------------------------------------------------------------*/
+
+syntax = "proto3";
+
+package netpune.profiler.api;
+
+import "message.proto";
+
+// ExecutorAPI definition
+service ExecutorAPI {
+  // Launch remote task
+  rpc Launch(LaunchRequest) returns (LaunchResponse);
+}
+
+// LaunchRequest message containing
+message LaunchRequest {}
+// LaunchResponse message containing
+message LaunchResponse {}

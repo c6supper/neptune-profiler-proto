@@ -8,3 +8,8 @@ syntax = "proto3";
 
 package netpune.profiler.message;
 
+// TaskInfo message containing
+message TaskInfo {}
+
+// SessionInfo message containing
+message SessionInfo {}

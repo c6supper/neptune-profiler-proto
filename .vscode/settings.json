@@ -1,7 +1,8 @@
 {
   "cSpell.words": [
     "proto",
-    "protoc"
+    "protoc",
+    "protolint"
   ],
   "editor.codeActionsOnSave": {
     "source.fixAll": true
