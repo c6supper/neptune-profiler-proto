@@ -11,7 +11,7 @@ package netpune.profiler.service;
 // The executor service definition.
 service Executor {
   // Sends a executor
-  rpc SayHello(HelloRequest) returns (HelloReply) {}
+  rpc launch(HelloRequest) returns (HelloReply) {}
   // Sends another executor
   rpc SayHelloAgain(HelloRequest) returns (HelloReply) {}
 }
