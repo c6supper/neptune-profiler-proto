@@ -8,8 +8,12 @@
     - [TaskInfo](#netpune.profiler.message.TaskInfo)
   
 - [api/executor_api.proto](#api/executor_api.proto)
+    - [KillRequest](#netpune.profiler.api.KillRequest)
+    - [KillResponse](#netpune.profiler.api.KillResponse)
     - [LaunchRequest](#netpune.profiler.api.LaunchRequest)
     - [LaunchResponse](#netpune.profiler.api.LaunchResponse)
+    - [ListRequest](#netpune.profiler.api.ListRequest)
+    - [ListResponse](#netpune.profiler.api.ListResponse)
   
     - [ExecutorAPI](#netpune.profiler.api.ExecutorAPI)
   
@@ -60,6 +64,26 @@ TaskInfo message containing
 
 
 
+<a name="netpune.profiler.api.KillRequest"></a>
+
+### KillRequest
+KillRequest message containing
+
+
+
+
+
+
+<a name="netpune.profiler.api.KillResponse"></a>
+
+### KillResponse
+KillResponse message containing
+
+
+
+
+
+
 <a name="netpune.profiler.api.LaunchRequest"></a>
 
 ### LaunchRequest
@@ -79,6 +103,26 @@ LaunchResponse message containing
 
 
 
+
+<a name="netpune.profiler.api.ListRequest"></a>
+
+### ListRequest
+ListRequest message containing
+
+
+
+
+
+
+<a name="netpune.profiler.api.ListResponse"></a>
+
+### ListResponse
+ListResponse message containing
+
+
+
+
+
  
 
  
@@ -93,7 +137,9 @@ ExecutorAPI definition
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| LAUNCH_TEST | [LaunchRequest](#netpune.profiler.api.LaunchRequest) | [LaunchResponse](#netpune.profiler.api.LaunchResponse) | LAUNCH_TEST asdfasdf |
+| Launch | [LaunchRequest](#netpune.profiler.api.LaunchRequest) | [LaunchResponse](#netpune.profiler.api.LaunchResponse) | Launch remote task |
+| Kill | [KillRequest](#netpune.profiler.api.KillRequest) | [KillResponse](#netpune.profiler.api.KillResponse) | Kill remote session |
+| List | [ListRequest](#netpune.profiler.api.ListRequest) | [ListResponse](#netpune.profiler.api.ListResponse) | List remote sessions |
 
  
 

@@ -42,7 +42,7 @@ if(CPP)
   message(STATUS "Using gRPC ${gRPC_VERSION}")
   set(_GRPC_GRPCPP gRPC::grpc++)
 
-  set(TARGET_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp_install/${CMAKE_SYSTEM_PROCESSOR})
+  set(TARGET_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
   set(CMAKE_TARGET_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpp)
 
@@ -128,7 +128,7 @@ if(CPP)
     PATTERN "*.h" # select header files
   )
 
-  install(TARGETS neptune-profiler-proto DESTINATION ${TARGET_DIRECTORY}/lib)
+  install(TARGETS neptune-profiler-proto DESTINATION ${TARGET_DIRECTORY}/cpp/${CMAKE_SYSTEM_PROCESSOR}/lib)
 endif(CPP)
 
 if(DOC)

@@ -14,9 +14,25 @@ import "message.proto";
 service ExecutorAPI {
   // Launch remote task
   rpc Launch(LaunchRequest) returns (LaunchResponse);
+
+  // Kill remote session
+  rpc Kill(KillRequest) returns (KillResponse);
+
+  // List remote sessions
+  rpc List(ListRequest) returns (ListResponse);
 }
 
 // LaunchRequest message containing
 message LaunchRequest {}
 // LaunchResponse message containing
 message LaunchResponse {}
+
+// KillRequest message containing
+message KillRequest {}
+// KillResponse message containing
+message KillResponse {}
+
+// ListRequest message containing
+message ListRequest {}
+// ListResponse message containing
+message ListResponse {}
