@@ -3,32 +3,32 @@
 
 ## Table of Contents
 
-- [message.proto](#message.proto)
-    - [SessionInfo](#netpune.profiler.message.SessionInfo)
-    - [TaskInfo](#netpune.profiler.message.TaskInfo)
+- [message.proto](#message-proto)
+    - [SessionInfo](#netpune-profiler-message-SessionInfo)
+    - [TaskInfo](#netpune-profiler-message-TaskInfo)
   
-- [api/executor_api.proto](#api/executor_api.proto)
-    - [KillRequest](#netpune.profiler.api.KillRequest)
-    - [KillResponse](#netpune.profiler.api.KillResponse)
-    - [LaunchRequest](#netpune.profiler.api.LaunchRequest)
-    - [LaunchResponse](#netpune.profiler.api.LaunchResponse)
-    - [ListRequest](#netpune.profiler.api.ListRequest)
-    - [ListResponse](#netpune.profiler.api.ListResponse)
+- [api/executor_api.proto](#api_executor_api-proto)
+    - [KillRequest](#netpune-profiler-api-KillRequest)
+    - [KillResponse](#netpune-profiler-api-KillResponse)
+    - [LaunchRequest](#netpune-profiler-api-LaunchRequest)
+    - [LaunchResponse](#netpune-profiler-api-LaunchResponse)
+    - [ListRequest](#netpune-profiler-api-ListRequest)
+    - [ListResponse](#netpune-profiler-api-ListResponse)
   
-    - [ExecutorAPI](#netpune.profiler.api.ExecutorAPI)
+    - [ExecutorAPI](#netpune-profiler-api-ExecutorAPI)
   
 - [Scalar Value Types](#scalar-value-types)
 
 
 
-<a name="message.proto"></a>
+<a name="message-proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## message.proto
 
 
 
-<a name="netpune.profiler.message.SessionInfo"></a>
+<a name="netpune-profiler-message-SessionInfo"></a>
 
 ### SessionInfo
 SessionInfo message containing
@@ -38,7 +38,7 @@ SessionInfo message containing
 
 
 
-<a name="netpune.profiler.message.TaskInfo"></a>
+<a name="netpune-profiler-message-TaskInfo"></a>
 
 ### TaskInfo
 TaskInfo message containing
@@ -57,14 +57,14 @@ TaskInfo message containing
 
 
 
-<a name="api/executor_api.proto"></a>
+<a name="api_executor_api-proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/executor_api.proto
 
 
 
-<a name="netpune.profiler.api.KillRequest"></a>
+<a name="netpune-profiler-api-KillRequest"></a>
 
 ### KillRequest
 KillRequest message containing
@@ -74,7 +74,7 @@ KillRequest message containing
 
 
 
-<a name="netpune.profiler.api.KillResponse"></a>
+<a name="netpune-profiler-api-KillResponse"></a>
 
 ### KillResponse
 KillResponse message containing
@@ -84,7 +84,7 @@ KillResponse message containing
 
 
 
-<a name="netpune.profiler.api.LaunchRequest"></a>
+<a name="netpune-profiler-api-LaunchRequest"></a>
 
 ### LaunchRequest
 LaunchRequest message containing
@@ -94,7 +94,7 @@ LaunchRequest message containing
 
 
 
-<a name="netpune.profiler.api.LaunchResponse"></a>
+<a name="netpune-profiler-api-LaunchResponse"></a>
 
 ### LaunchResponse
 LaunchResponse message containing
@@ -104,7 +104,7 @@ LaunchResponse message containing
 
 
 
-<a name="netpune.profiler.api.ListRequest"></a>
+<a name="netpune-profiler-api-ListRequest"></a>
 
 ### ListRequest
 ListRequest message containing
@@ -114,7 +114,7 @@ ListRequest message containing
 
 
 
-<a name="netpune.profiler.api.ListResponse"></a>
+<a name="netpune-profiler-api-ListResponse"></a>
 
 ### ListResponse
 ListResponse message containing
@@ -130,16 +130,16 @@ ListResponse message containing
  
 
 
-<a name="netpune.profiler.api.ExecutorAPI"></a>
+<a name="netpune-profiler-api-ExecutorAPI"></a>
 
 ### ExecutorAPI
 ExecutorAPI definition
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Launch | [LaunchRequest](#netpune.profiler.api.LaunchRequest) | [LaunchResponse](#netpune.profiler.api.LaunchResponse) | Launch remote task |
-| Kill | [KillRequest](#netpune.profiler.api.KillRequest) | [KillResponse](#netpune.profiler.api.KillResponse) | Kill remote session |
-| List | [ListRequest](#netpune.profiler.api.ListRequest) | [ListResponse](#netpune.profiler.api.ListResponse) | List remote sessions |
+| Launch | [LaunchRequest](#netpune-profiler-api-LaunchRequest) | [LaunchResponse](#netpune-profiler-api-LaunchResponse) | Launch remote task |
+| Kill | [KillRequest](#netpune-profiler-api-KillRequest) | [KillResponse](#netpune-profiler-api-KillResponse) | Kill remote session |
+| List | [ListRequest](#netpune-profiler-api-ListRequest) | [ListResponse](#netpune-profiler-api-ListResponse) | List remote sessions |
 
  
 

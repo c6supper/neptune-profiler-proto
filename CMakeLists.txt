@@ -59,17 +59,20 @@ if(CPP)
   string(REGEX REPLACE "[.]proto" ".pb.cc;" SRC_FILES ${SRC_FILES})
 
   # Replace .proto -> .pb.h
-  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_FILES ${PROTO_FILES})
-  string(REGEX REPLACE "[.]proto" ".pb.h;" INC_FILES ${INC_FILES})
+  # string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_FILES ${PROTO_FILES})
+  # string(REGEX REPLACE "[.]proto" ".pb.h;" INC_FILES ${INC_FILES})
 
   # Replace .proto -> .grpc.pb.cc
   string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_GRPC_FILES ${GRPC_PROTO_FILES})
   string(REGEX REPLACE "[.]proto" ".grpc.pb.cc;" SRC_GRPC_FILES ${SRC_GRPC_FILES})
 
-  # Replace .proto -> grpc.pb.h
-  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_GRPC_FILES ${GRPC_PROTO_FILES})
-  string(REGEX REPLACE "[.]proto" ".grpc.pb.h;" INC_GRPC_FILES ${INC_GRPC_FILES})
+  # Replace .proto -> .grpc.pb.cc
+  string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" SRC_API_FILES ${GRPC_PROTO_FILES})
+  string(REGEX REPLACE "[.]proto" ".pb.cc;" SRC_API_FILES ${SRC_API_FILES})
 
+  # Replace .proto -> grpc.pb.h
+  # string(REGEX REPLACE "${CMAKE_CURRENT_LIST_DIR}/proto" "${CMAKE_TARGET_DIRECTORY}" INC_GRPC_FILES ${GRPC_PROTO_FILES})
+  # string(REGEX REPLACE "[.]proto" ".grpc.pb.h;" INC_GRPC_FILES ${INC_GRPC_FILES})
   message(DEBUG "SRC_FILES=${SRC_FILES}")
   message(DEBUG "SRC_GRPC_FILES=${SRC_GRPC_FILES}")
 
@@ -108,17 +111,18 @@ if(CPP)
   # endif()
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/cpp")
 
-  add_library(neptune-profiler-proto SHARED
+  add_library(${PROJECT_NAME} SHARED
     ${SRC_FILES}
     ${SRC_GRPC_FILES}
+    ${SRC_API_FILES}
   )
 
-  target_link_libraries(neptune-profiler-proto
+  target_link_libraries(${PROJECT_NAME}
     ${_REFLECTION}
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
 
-  get_target_property(TARGET_LIBRARIES neptune-profiler-proto LINK_LIBRARIES)
+  get_target_property(TARGET_LIBRARIES ${PROJECT_NAME} LINK_LIBRARIES)
   message(${TARGET_LIBRARIES})
 
   install(
@@ -128,15 +132,15 @@ if(CPP)
     PATTERN "*.h" # select header files
   )
 
-  install(TARGETS neptune-profiler-proto DESTINATION ${TARGET_DIRECTORY}/cpp/${CMAKE_SYSTEM_PROCESSOR}/lib)
+  install(TARGETS ${PROJECT_NAME} DESTINATION ${TARGET_DIRECTORY}/cpp/${CMAKE_SYSTEM_PROCESSOR}/lib)
 endif(CPP)
 
 if(DOC)
-  set(DOC_FILE "${CMAKE_CURRENT_LIST_DIR}/doc/neptune-profiler-proto-doc.md")
+  set(DOC_FILE "${CMAKE_CURRENT_LIST_DIR}/doc/${PROJECT_NAME}-doc.md")
   add_custom_command(
     OUTPUT ${DOC_FILE}
     COMMAND ${PROTOC}
-    ARGS --doc_out=markdown,neptune-profiler-proto-doc.md:${CMAKE_CURRENT_LIST_DIR}/doc
+    ARGS --doc_out=markdown,${PROJECT_NAME}-doc.md:${CMAKE_CURRENT_LIST_DIR}/doc
     -I "${CMAKE_CURRENT_LIST_DIR}/proto/"
     -I "${CMAKE_CURRENT_LIST_DIR}/api/proto/"
     "${CMAKE_CURRENT_LIST_DIR}/proto/*.proto"
